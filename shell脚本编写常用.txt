@@ -1,0 +1,41 @@
+#!bin/sh        ## 脚本开头
+
+: > $file       ## 清空文件
+
+$(dirname $0)   ## 脚本所在目录
+
+date +%Y-%m-%d  ## 同date -I
+
+rsync -avrP     ## 传输文件
+
+seq -w 0 99     ## 输出00至99
+
+## 随机获取文件中的20行内容
+	shuf -n 20 $file   
+
+## 文件不存在则异常退出
+	[ ! -f $file ] && { exit 1; }  
+
+## 免密登录MySQL
+mysql --login-path=
+
+## 连接remote主机并执行其中的shell
+	ssh $REMOTE_HOST "sh -x $REMOTE_SH"   
+
+## 发预警邮件
+	a) mailx -s "title" -a $file $@email <<< "content"
+	b) echo "content" | mailx -s "title" -a $file $@email
+
+## 定期删除目录文件
+	find $dir -maxdepth 1 -type d -mtime +14 -exec rm -rf {} \;
+
+
+--详解
+atime --Access访问
+mtime --Modify数据修改
+ctime --Change状态修改
+
+cat $file          --只改变atime
+chomd/chown $file  --只改变ctime
+echo >>> $file     --改变mtime和ctime
+touch/vim $file    --都修改
